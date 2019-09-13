@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from collections import deque
+from random import sample
 
 
 class DeepQModel:
@@ -107,7 +108,7 @@ class DeepQModel:
             samples = self.replayBuffer
         for observation in samples:
             state, action, reward, next_state, done = observation
-            if done == True:
+            if done is True:
                 t = reward
             else:
                 next_state_max_reward = np.amax(self.targetModel.predict(next_state))
