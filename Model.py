@@ -102,19 +102,21 @@ class DeepQModel:
             The batch to be trained after every play
         """
         if batchSize < len(self.replayBuffer):
+            samples = sample(self.replayBuffer, batchSize)
+        else:
             samples = self.replayBuffer
-            for observation in samples:
-                state, action, reward, next_state, done = observation
-                if done == True:
-                    t = reward
-                else:
-                    next_state_max_reward = np.amax(self.targetModel.predict(next_state))
-                    t = reward + (self.gamma * next_state_max_reward)
+        for observation in samples:
+            state, action, reward, next_state, done = observation
+            if done == True:
+                t = reward
+            else:
+                next_state_max_reward = np.amax(self.targetModel.predict(next_state))
+                t = reward + (self.gamma * next_state_max_reward)
 
-                target_action_pair = self.predictionModel.predict(state)
-                target_action_pair[0][action] = t
-                self.predictionModel.fit(state, target_action_pair, epochs=1, verbose=0)
-            self.decay()
+            target_action_pair = self.predictionModel.predict(state)
+            target_action_pair[0][action] = t
+            self.predictionModel.fit(state, target_action_pair, epochs=1, verbose=0)
+        self.decay()
 
 
 
