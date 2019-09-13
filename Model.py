@@ -1,5 +1,4 @@
 import tensorflow as tf
-from random import sample
 import numpy as np
 from collections import deque
 
@@ -9,7 +8,7 @@ class DeepQModel:
         Description
         -----------
             the class deals with building the right parameters and functions to
-            built a deep learnig agent that learn and play games
+            built a deep learning agent that learn and play games
         Parameters
         ----------
         input_shape : Integer
