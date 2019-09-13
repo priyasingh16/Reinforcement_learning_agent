@@ -63,7 +63,6 @@ class Agent:
 
 
 def main():
-
     # Defining size of the frame by reducing it by half
     img_height = int(224/2)
     img_width = int(256/2)
@@ -103,9 +102,8 @@ def main():
                 model.syncNetworks()
                 break
             model.train()
-
-        agent.env.reset()
-        agent.env.close()
+            agent.env.reset()
+            agent.env.close()
 
 
 if __name__ == "__main__":
