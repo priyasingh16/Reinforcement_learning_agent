@@ -3,8 +3,9 @@ from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
 from skimage.transform import resize
 from collections import deque
 from Utils import Utils
+from Model import DeepQModel
 import gym_super_mario_bros
-import numpy as np
+import numpy as np 
 import random
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -21,8 +22,6 @@ class Agent:
         self.obs = deque(maxlen=4)
         self.height = height
         self.width = width
-
-        # intitial the state with 4 empty frames
         self.obs.append(np.zeros((height, width)))
         self.obs.append(np.zeros((height, width)))
         self.obs.append(np.zeros((height, width)))
@@ -57,14 +56,46 @@ class Agent:
 
 def main():
 
-        img_height = int(224/2)
-        img_width = int(256/2)
-        input_shape = (img_height, img_width, 4)
+    img_height = int(224/2)
+    img_width = int(256/2)
+    input_shape = (img_height, img_width, 4)
+    agent = Agent(img_height, img_width)
+    output_shape = agent.num_actions
+    agent.env.reset()
+    agent.env.close()
+    model = DeepQModel(input_shape, output_shape, 0.01, 0.999)
+    episode = 1000
+
+
+
+    for i in range(episode):
+
         agent = Agent(img_height, img_width)
-        output_shape = agent.num_actions
+        current_state = agent.obs.copy()
+        current_state = np.array(current_state)
+        current_state = current_state.transpose(1,2,0)
+        current_state = np.array([current_state])
+        curr_time = 400
+
+        for step in range(0,10000):
+            action = agent.randomAction() if model.epsilon_condition() else\
+                np.argmax(model.predict([current_state])[0])
+            
+            current_state, next_state, reward, _, done, curr_time = agent.play(action, curr_time)
+            current_state = np.array([current_state])
+            next_state = np.array([next_state])
+            model.appendReplay((current_state, action, reward, next_state, done))
+            current_state = next_state
+            if i % 10 == 0:
+                agent.env.render()
+            if done:
+                print("Episode", i, step, model.epsilon)
+                model.syncNetworks()
+                break
+            model.train()
+
         agent.env.reset()
         agent.env.close()
-
 
 if __name__ == "__main__":
     main()
