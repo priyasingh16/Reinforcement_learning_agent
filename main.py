@@ -96,7 +96,7 @@ def main():
             next_state = np.array([next_state])
             model.appendReplay((current_state, action, reward, next_state, done))
             current_state = next_state
-            agent.env.render()
+            # agent.env.render()
             if done:
                 print("Episode", i, step, model.epsilon)
                 model.syncNetworks()
